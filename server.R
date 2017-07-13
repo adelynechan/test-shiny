@@ -25,8 +25,8 @@ shinyServer(function(input, output) {
   })
   
   output$logfcPlot <- renderPlot({
-    name <- paste0(input$genename, ".png")
-    ggsave(name, plotLogFC())
+    #name <- paste0(input$genename, ".png")
+    #ggsave(name, plotLogFC())
     plotLogFC()
   })
 
