@@ -3,8 +3,6 @@ shinyUI(fluidPage(
   
   textInput("ensembl_id", "Ensembl ID", "ENSG00000141510", placeholder="ENSG..."), 
   verbatimTextOutput("selected_gene_ensembl_id"),
-  
-  textInput('genename', "Gene Name", "TP53"),
 
   mainPanel(
     plotOutput("logfcPlot")

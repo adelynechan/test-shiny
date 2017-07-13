@@ -20,8 +20,15 @@ shinyServer(function(input, output) {
     return (x)
   })
   
+  geneSymbol_ensemblID <- read.table("data/biomart_geneSymbol_ensemblID.txt", header=TRUE, sep=",")
+  
+  geneSymbol <- reactive({
+    selected_gene_symbol <- as.character(geneSymbol_ensemblID$Gene.name[geneSymbol_ensemblID$Gene.stable.ID == input$ensembl_id])
+    return (selected_gene_symbol)
+  })
+  
   plotLogFC <- reactive({
-    ggplot(selected_genes_expression(), aes(x=sample, y=logFC, group=ilmn_id, colour=dataset)) + geom_point() + geom_line() + geom_hline(yintercept=0) + scale_colour_manual(values=c("blue", "red")) + ggtitle(input$genename)
+    ggplot(selected_genes_expression(), aes(x=sample, y=logFC, group=ilmn_id, colour=dataset)) + geom_point() + geom_line() + geom_hline(yintercept=0) + scale_colour_manual(values=c("blue", "red")) + ggtitle(geneSymbol())
   })
   
   output$logfcPlot <- renderPlot({
