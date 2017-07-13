@@ -1,16 +1,34 @@
+library(ggplot2)
+
 shinyServer(function(input, output) {
   
-  microarray_data <- read.table("data/microarray.txt")
-  selected_gene_microarray_data <- microarray_data[microarray_data$ensembl_id == input,]
+  # Expression that generates a histogram. The expression is
+  # wrapped in a call to renderPlot to indicate that:
+  #
+  #  1) It is "reactive" and therefore should re-execute automatically
+  #     when inputs change
+  #  2) Its output type is a plot
   
-  output$main_plot <- renderPlot({
+  microarray <- read.table("data/microarray.txt", header=TRUE, sep="\t")
+  microarray$ensembl_id <- as.character(microarray$ensembl_id)
+
+  selected_genes_expression <- reactive({
+    selected_gene <- input$ensembl_id
+    x <- microarray[microarray$ensembl_id == input$ensembl_id,]
+    x$sample <- factor(x$sample, levels=c("0d", "2h", "4h", "8h", "12h", "1d", "32h", "2d", "3d", "4d", "5d", "6d", "7d", "8d"))
     
-    ggplot(selected_genes_logfc, aes(x=sample, y=logfc, group=gene_symbol, color=gene_symbol)) 
-    + geom_point() + theme(axis.text.x=element_text(angle=270))
-    
+    return (x)
   })
   
+  plotLogFC <- reactive({
+    ggplot(selected_genes_expression(), aes(x=sample, y=logFC, group=ilmn_id, colour=dataset)) + geom_point() + geom_line() + geom_hline(yintercept=0) + scale_colour_manual(values=c("blue", "red")) + ggtitle(input$genename)
+  })
+  
+  output$logfcPlot <- renderPlot({
+    name <- paste0(input$genename, ".png")
+    ggsave(name, plotLogFC())
+    plotLogFC()
+  })
+
 })
-
-
 
